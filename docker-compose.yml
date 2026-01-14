@@ -2,6 +2,9 @@ version: '3.8'
 
 services:
   sb5-docker-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: fastapi_service
     restart: always
     ports:
