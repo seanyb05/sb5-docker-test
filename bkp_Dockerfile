@@ -1,0 +1,43 @@
+# Stage 1: Build stage
+FROM python:3.11-slim AS builder
+
+# 1. Set environment variables for Poetry
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+# Install Poetry
+RUN pip install poetry==1.8.2
+
+WORKDIR /app
+
+# 2. COPY ONLY configuration files first to leverage Docker layer caching
+# This ensures dependencies aren't re-downloaded unless these files change
+COPY pyproject.toml poetry.lock* ./
+
+# 3. Install dependencies without the root package
+# This step installs everything into /app/.venv
+RUN poetry install --no-root --without dev && rm -rf $POETRY_CACHE_DIR
+
+# Stage 2: Runtime stage
+FROM python:3.11-slim AS runtime
+
+ENV VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH"
+
+WORKDIR /app
+
+# 4. Copy ONLY the virtual environment from the builder stage
+COPY --from=builder /app/.venv /app/.venv
+
+# 5. Copy the rest of your application code
+COPY . .
+
+# (Optional) If your project is a package, install the root now
+# RUN poetry install --without dev
+
+ENTRYPOINT ["python", "main.py"]
+
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8082"]
