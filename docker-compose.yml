@@ -1,30 +1,18 @@
-version: "3"
-
-services:
-  web:
-    build: .
-    ports:
-      - 8001:8001
-    volumes:
-      - .:/app
-
 version: '3.8'
 
 services:
-  fastapi-app:
-    # Use the image you built and pushed to a registry (e.g., Docker Hub)
-    image: your-dockerhub-username/fastapi-poetry-app:latest
+  sb5-docker-test:
     container_name: fastapi_service
     restart: always
     ports:
-      - "8000:8000"
+      - "8001:8001"
     environment:
       - ENV=production
       - TZ=America/New_York
     volumes:
       # Synology paths MUST start with /volumeX/
-      - /volume1/docker/fastapi/logs:/app/logs
-      - /volume1/docker/fastapi/data:/app/data
+      - /volume1/docker/sb5-docker-test/logs:/app/logs
+      - /volume1/docker/sb5-docker-test:/app/data
     networks:
       - backend_network
 
