@@ -3,7 +3,8 @@ import requests
 def push_url_to_db(target_url: str):
     # Use your NAS IP or 'localhost' if running on the same machine
     # Port 8000 matches your Portainer/Compose mapping
-    api_endpoint = "http://localhost:8001/update-db"
+    # api_endpoint = "http://localhost:8001/update-db"
+    api_endpoint = "http://192.168.1.64:8001/update-db"
 
     # This dictionary becomes the 'payload' in your FastAPI method
     payload = {
